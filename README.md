@@ -9,7 +9,9 @@ Steps To Create Windows Server
 *Copy the auth key from ngrok and add to github repository secrets
 *Setup New Workflow Manually the Put the following code in main.yml and commit changes
 
-`code(name: CI
+code(
+
+name: CI
 
 on: [push, workflow_dispatch]
 
@@ -34,4 +36,4 @@ jobs:
     - run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
     - name: Create Tunnel
       run: .\ngrok\ngrok.exe tcp 3389
-)`
+)
