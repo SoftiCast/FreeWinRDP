@@ -1,12 +1,42 @@
 # Free Windows Server 2022 With RDP For Lifetime
 
-<p> This repository is all about getting free windows server 2022 with rdp using github jobs & ngrok tunnel. In this github repository i added the step by step guide to have a free windows vsp server thorugh github and accessing it via remote desktop connection. </p>
+<p> This repository is all about getting free Windows Server 2022 with RDP using GitHub jobs & ngrok tunnel. In this GitHub repository, I added the step-by-step guide to have a free Windows VPS server through GitHub and access it via remote desktop connection. </p>
 
-Steps To Create Windows Server
-* Sign Up a GitHub Account : https://github.com/
+Steps To Create a Windows Server
+* Sign Up a GitHub Account: https://github.com/
 * Create a Private Repository, Go to repository settings > Secrets and variables > Actions > New Repository Secrets
-* Sign Up a Ngrok Account : https://ngrok.com/
-* Copy the auth key from ngrok and add to github repository secrets
-* Setup New Workflow Manually the Put the following code in main.yml and commit changes
+* Sign Up a Ngrok Account: https://ngrok.com/
+* Copy the auth key from ngrok and add it to the GitHub repository secrets
+* Setup New Workflow Manually Put the following code in main.yml and commit changes
 
+code( name: CI
 
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - name: Download
+      run: Invoke-WebRequest https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
+    - name: Extract
+      run: Expand-Archive ngrok.zip
+    - name: Auth
+      run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+      env:
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+    - name: Enable TS
+      run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+    - run: Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+    - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+    - run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
+    - name: Create Tunnel
+      run: .\ngrok\ngrok.exe tcp 3389
+ )
+
+* Run The WorkFlow and take note of credentials (runneradmin:P@ssw0rd!)
+* Get the ngrok endpoint URL and use it as IP or address in Remote Desktop Connection with credentials
+
+# Thanks
